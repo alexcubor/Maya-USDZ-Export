@@ -1,13 +1,8 @@
-Support maya versions
-
+#### Support maya versions
 2024-...
 
-
-Install
-
+#### Install
 Copy contained to ~Documents/maya
 
-
-Using
-
+#### Using
 Run python script ```import usdMayaExport; usdMayaExport.export_selection_to_usd()```
