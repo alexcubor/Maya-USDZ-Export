@@ -4,9 +4,10 @@ import shutil
 import os
 import tempfile
 from usdzconvert import tryProcess
+import maya.mel
 
 
-def export_selection_to_usd():
+def export_selection_to_usdz():
     # Ensure the USD plugin is loaded
     if not cmds.pluginInfo('mayaUsdPlugin', query=True, loaded=True):
         cmds.loadPlugin('mayaUsdPlugin')
@@ -19,19 +20,18 @@ def export_selection_to_usd():
         return
 
     export_path = export_path[0]
-    temp_path = os.path.join(tempfile.gettempdir(), export_path.split('/')[-1].replace('usdz', 'usd'))
+    temp_path_usd = os.path.join(tempfile.gettempdir(), export_path.split('/')[-1].replace('usdz', 'usd'))
     
     # Export the selection to USD
     try:
-        cmds.file(temp_path, force=True, options=";", type="USD Export", exportSelected=True, preserveReferences=True)
+        cmds.file(temp_path_usd, force=True, options=";", type="USD Export", exportSelected=True, preserveReferences=True)
         try:
-            tryProcess([temp_path])
+            tryProcess([temp_path_usd])
         except:
             pass
-        os.remove(temp_path)
-        shutil.copy(temp_path + 'z', export_path)
+        shutil.copy(temp_path_usd, export_path.replace('usdz', 'usd'))
+        shutil.copy(temp_path_usd + 'z', export_path)
         om.MGlobal.displayInfo(f"File exported to: {export_path}")
     except Exception as e:
         om.MGlobal.displayError(f"Failed to export USDZ file: {str(e)}")
         return
-

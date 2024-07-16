@@ -1,0 +1,19 @@
+global proc exportToUSDZ() {
+    python("import usdMayaExport; usdMayaExport.export_selection_to_usdz()");
+}
+
+global proc createUSDZMenu() {
+    // Check if the menu already exists
+    if (`menu -exists "USDZMenu"`) {
+        deleteUI -menu "USDZMenu";
+    }
+    
+    // Create the USDZ menu
+    menu -label "USDZ" -parent MayaWindow -tearOff true USDZMenu;
+    
+    // Add an item to the USDZ menu
+    menuItem -label "Export to USDZ" -command "exportToUSDZ" USDZMenu;
+}
+
+// Run the function to create the menu
+createUSDZMenu();
