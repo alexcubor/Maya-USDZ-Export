@@ -5,4 +5,6 @@
 Copy contained to ~Documents/maya
 
 #### Using
-Run python script ```import usdMayaExport; usdMayaExport.export_selection_to_usd()```
+Main menu > USDZ > Export to USDZ
+
+Command creating USD and USDZ file (work with windows network paths)
