@@ -27,10 +27,31 @@ def export_selection_to_usdz():
         start_frame = cmds.playbackOptions(q=True, min=True)
         end_frame = cmds.playbackOptions(q=True, max=True)
         cmds.optionVar(iv=('customFileDialogIncludeUVs', True))
-        options_str = ";exportUVs=1;exportSkels=auto;exportSkin=auto;exportBlendShapes=1;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=1;defaultMeshScheme=none;animation=1;eulerFilter=0;staticSingleSample=0;startTime={};endTime={};frameStride=1;frameSample=0.0;defaultUSDFormat=usdc;parentScope=;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;stripNamespaces=1;worldspace=0;materialsScopeName=mtl".format(
+        # Prepare normal nodes for USD
+        bump_nodes = cmds.ls(type="bump2d")
+        for bump_node in bump_nodes:
+            try:
+                tex_node = cmds.listConnections(bump_node + ".bumpValue")[0]
+                shader = cmds.listConnections(bump_node + ".outNormal")[0]
+                cmds.connectAttr(tex_node + ".outColor", shader + ".normalCamera", f=1)
+            except:
+                pass
+
+        options_str = ";exportUVs=1;exportSkels=auto;exportSkin=auto;exportBlendShapes=1;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=1;defaultMeshScheme=none;animation=1;eulerFilter=0;staticSingleSample=0;startTime={};endTime={};frameStride=1;frameSample=0.0;defaultUSDFormat=usdc;parentScope=;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;stripNamespaces=0;worldspace=0;materialsScopeName=mtl".format(
             start_frame, end_frame)
         cmds.file(temp_path_usd, force=True, options=options_str, type="USD Export", exportSelected=True, pr=True,
                   es=True)
+        
+        # Return connection normal nodes for Maya
+        bump_nodes = cmds.ls(type="bump2d")
+        for bump_node in bump_nodes:
+            try:
+                tex_node = cmds.listConnections(bump_node + ".bumpValue")[0]
+                shader = cmds.listConnections(tex_node + ".outColor")[0]
+                cmds.connectAttr(bump_node + ".outNormal", shader + ".normalCamera", f=1)
+            except:
+                pass
+
         try:
             tryProcess([temp_path_usd])
         except:
